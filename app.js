@@ -1,21 +1,22 @@
 function moveHands() {
     with(new Date()) {
-        let hoursInClockDay = hoursInClock * 2;
-        let minutesInClockHour = hoursInClock * 5;
-        let secondsInClockMinute = hoursInClock * 5;
-        let millisecondsToday = getMilliseconds() + 1e3 * (getSeconds() + 60 * (getMinutes() + 60 * getHours()));
-        let millisecondsRealDay = 1000*60*60*24;
-        let millisecondsInClockHour = millisecondsRealDay / hoursInClockDay;
-        let millisecondsInClockMinute = millisecondsInClockHour / minutesInClockHour;
-        let millisecondsInClockSecond = millisecondsInClockMinute / secondsInClockMinute;
+        //keeping certian ratios fixed:
+        const hoursInClockDay = hoursInClock * 2;
+        const minutesInClockHour = hoursInClock * 5;
+        const secondsInClockMinute = hoursInClock * 5;
+        const millisecondsToday = getMilliseconds() + 1e3 * (getSeconds() + 60 * (getMinutes() + 60 * getHours()));
+        const millisecondsRealDay = 1000*60*60*24;
+        const millisecondsInClockHour = millisecondsRealDay / hoursInClockDay;
+        const millisecondsInClockMinute = millisecondsInClockHour / minutesInClockHour;
+        const millisecondsInClockSecond = millisecondsInClockMinute / secondsInClockMinute;
 
-        let seconds = Math.round((millisecondsToday % millisecondsInClockMinute) / millisecondsInClockSecond);
-        let minutes = Math.round(((millisecondsToday - seconds*millisecondsInClockSecond) % millisecondsInClockHour) / millisecondsInClockMinute);
-        let hours = Math.round(((millisecondsToday - seconds*millisecondsInClockSecond - minutes*millisecondsInClockMinute) / millisecondsInClockHour));
+        const seconds = Math.round((millisecondsToday % millisecondsInClockMinute) / millisecondsInClockSecond);
+        const minutes = Math.round(((millisecondsToday - seconds*millisecondsInClockSecond) % millisecondsInClockHour) / millisecondsInClockMinute);
+        const hours = Math.round(((millisecondsToday - seconds*millisecondsInClockSecond - minutes*millisecondsInClockMinute) / millisecondsInClockHour));
 
-        let h = 360 / hoursInClock * (hours % hoursInClock + minutes / minutesInClockHour);
-        let m = 360 / minutesInClockHour * (minutes + seconds / secondsInClockMinute);
-        let s = 360 / secondsInClockMinute * seconds;
+        const h = 360 / hoursInClock * (hours % hoursInClock + minutes / minutesInClockHour);
+        const m = 360 / minutesInClockHour * (minutes + seconds / secondsInClockMinute);
+        const s = 360 / secondsInClockMinute * seconds;
 
         document.getElementById('seconds').style.cssText = "-webkit-transform:rotate(" + s + "deg);"; // setting the rotate CSS attribute to those degree values
         document.getElementById('minutes').style.cssText = "-webkit-transform:rotate(" + m + "deg);";
@@ -28,14 +29,15 @@ function moveHands() {
 function setFace(){
     var width = $('.clock').width();
     var r = width * .4
-    var letterHeight = 40;
-    var letterWidth = 30;
+    const characterScaling = Math.sqrt(12) / Math.sqrt(hoursInClock);
 
     for(var numeral=hoursInClock; numeral>0; numeral -= 1) {
-        let size = numeral === hoursInClock ? 60 : 40;
-        let widthAdjustment = numeral > 9 ? 2 : 1;
-        var x = Math.round(r*Math.sin(Math.PI*2*(numeral/hoursInClock))) + width/2 - letterWidth/2*widthAdjustment;
-        var y = Math.round(r*Math.cos(Math.PI*2*(numeral/hoursInClock))) - width/2 + letterHeight/2;
+        const size = (numeral === hoursInClock ? 60 : 40) * characterScaling;
+        const characterHeight = size;
+        const characterWidth = size*0.6359; //magic,
+        const characterCount = numeral.toString().length;
+        var x = Math.round(r*Math.sin(Math.PI*2*(numeral/hoursInClock))) + width/2 - characterWidth/2*characterCount;
+        var y = Math.round(r*Math.cos(Math.PI*2*(numeral/hoursInClock))) - width/2 + characterHeight/2;
           $('<div>', {'class':'time'})
             .text(numeral)
             .css({ 'left': (x)+'px', 'top': (-y)+'px', 'font-size': size+'px' })
@@ -43,8 +45,18 @@ function setFace(){
         }
 
 }
+const DEFAULT_HOURS_IN_CLOCK = 11;
+const hoursOverride = parseInt(window.location.hash.toString().replace('#', ''));
+const hoursInClock = (function(){
+    if (isNaN(hoursOverride)) {
+        return DEFAULT_HOURS_IN_CLOCK
+    }
+    if (hoursOverride < 0) {
+        return -hoursOverride
+    }
+    return hoursOverride
+})();
 
-const hoursInClock = 11;
 $(document).ready(function() {
     setFace();
     moveHands();
