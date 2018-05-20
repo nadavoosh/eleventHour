@@ -37,7 +37,6 @@ function setFace(){
         const characterWidth = size*0.6359; //magic,
         const characterCount = numeral.toString().length;
         var x = Math.round(r*Math.sin(Math.PI*2*(numeral/hoursInClock))) + width/2 - characterWidth/2*characterCount;
-        console.log('x is ' + x)
         var y = Math.round(r*Math.cos(Math.PI*2*(numeral/hoursInClock))) - width/2 + characterHeight/2;
           $('<div>', {'class':'time'})
             .text(numeral)
@@ -49,11 +48,15 @@ function setFace(){
 const DEFAULT_HOURS_IN_CLOCK = 11;
 const hoursOverride = parseInt(window.location.hash.toString().replace('#', ''));
 const hoursInClock = (function(){
-    if (hoursOverride == NaN) {
+    if (isNaN(hoursOverride)) {
         return DEFAULT_HOURS_IN_CLOCK
+    }
+    if (hoursOverride < 0) {
+        return -hoursOverride
     }
     return hoursOverride
 })();
+
 $(document).ready(function() {
     setFace();
     moveHands();
