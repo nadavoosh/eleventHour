@@ -1,7 +1,6 @@
 function moveHands() {
     with(new Date()) {
         //keeping certian ratios fixed:
-
         const hoursInClockDay = hoursInClock * 2;
         const minutesInClockHour = hoursInClock * 5;
         const secondsInClockMinute = hoursInClock * 5;
@@ -47,7 +46,14 @@ function setFace(){
         }
 
 }
-const hoursInClock = window.location.hash ? window.location.hash.toString().replace('#', '') : 11;
+const DEFAULT_HOURS_IN_CLOCK = 11;
+const hoursOverride = parseInt(window.location.hash.toString().replace('#', ''));
+const hoursInClock = (function(){
+    if (hoursOverride == NaN) {
+        return DEFAULT_HOURS_IN_CLOCK
+    }
+    return hoursOverride
+})();
 $(document).ready(function() {
     setFace();
     moveHands();
