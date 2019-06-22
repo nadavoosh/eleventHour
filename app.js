@@ -49,6 +49,22 @@ function setFace(){
 
 }
 
+function initClockHours() {
+    const DEFAULT_HOURS_IN_CLOCK = 11;
+    const hoursOverride = parseInt(window.location.hash.toString().replace('#', ''));
+    const initialValue = (function() {
+        if (isNaN(hoursOverride)) {
+            return DEFAULT_HOURS_IN_CLOCK
+        }
+        if (hoursOverride < 0) {
+            return -hoursOverride
+        }
+        return hoursOverride
+    })()
+    document.getElementById("hoursInput").value = initialValue
+
+}
+
 function getHoursInClock() {
     const DEFAULT_HOURS_IN_CLOCK = 11;
     let hoursOverride = document.getElementById("hoursInput").value;
@@ -62,6 +78,7 @@ function getHoursInClock() {
 }
 
 $(document).ready(function() {
+    initClockHours()
     setFace();
     moveHands();
 });
